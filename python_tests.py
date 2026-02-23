@@ -3,14 +3,8 @@ import numpy as np
 import os
 from tests.test_gemm import *
 from tests.test_gemmtr import *
-
-CblasRowMajor = 101
-CblasColMajor = 102
-CblasNoTrans = 111
-CblasTrans = 112
-CblasConjTrans = 113
-CblasUpper = 121
-CblasLower = 122
+from tests.test_symn import *
+from tests.test_hemm import *
 
 def load_openblas():
     lib_path = os.path.abspath("third_party/OpenBLAS/libopenblas_armv8p-r0.3.31.dev.dylib")
@@ -28,3 +22,9 @@ if __name__ == "__main__":
     test_gemmtr_d(lib)
     test_gemmtr_c(lib)
     test_gemmtr_z(lib)
+    test_symm_s(lib)
+    test_symm_d(lib)
+    test_symm_c(lib)
+    test_symm_z(lib)
+    test_hemm_c(lib)
+    test_hemm_z(lib)
