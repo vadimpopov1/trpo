@@ -1,6 +1,0 @@
-print("Hello world!")
-print("1 changes")
-print("2 changes")
-print("changes for new branch")
-print("changes on github to pull")
-print("new local changes")
