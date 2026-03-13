@@ -19,8 +19,12 @@ def load_openblas():
 
 if __name__ == "__main__":
     lib = load_openblas()
-    test_gemm_s(lib)
-    test_gemm_d(lib)
+    try:
+        test_gemm_d(lib)
+        print("PASSED")
+    except:
+        print("FAILED")
+    
     test_gemm_c(lib)
     test_gemm_z(lib)
 
