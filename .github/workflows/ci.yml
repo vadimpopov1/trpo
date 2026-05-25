@@ -1,0 +1,52 @@
+name: BLAS Tests CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip python3-numpy g++ make gfortran
+        pip3 install numpy
+
+    - name: Build OpenBLAS
+      run: |
+        cd third_party/OpenBLAS
+        make USE_OPENMP=0 NO_LAPACK=1 ONLY_CBLAS=1 -j$(nproc) 2>&1 | tail -20
+
+    - name: Fix library symlink for python_tests.py
+      run: |
+        cd third_party/OpenBLAS
+        ls libopenblas*.so
+        SO_FILE=$(ls libopenblas*.so 2>/dev/null | head -1)
+        if [ -n "$SO_FILE" ]; then
+          ln -sf "$SO_FILE" "libopenblas_armv8p-r0.3.31.dev.dylib"
+          echo "Created symlink: $SO_FILE -> libopenblas_armv8p-r0.3.31.dev.dylib"
+        fi
+
+    - name: Build syrc benchmark
+      run: |
+        cd syrc
+        g++ -std=c++11 -O2 syrc.cpp -o syrc -ldl -I../third_party/OpenBLAS
+
+    - name: Run interface tests (Python)
+      run: |
+        export LD_LIBRARY_PATH=$PWD/third_party/OpenBLAS:$LD_LIBRARY_PATH
+        python3 python_tests.py
+
+    - name: Run performance test (syrc)
+      run: |
+        export LD_LIBRARY_PATH=$PWD/third_party/OpenBLAS:$LD_LIBRARY_PATH
+        cd syrc && ./syrc 2>&1
