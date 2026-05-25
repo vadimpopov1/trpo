@@ -45,5 +45,3 @@ jobs:
         run: |
           export LD_LIBRARY_PATH=$PWD/third_party/OpenBLAS
           cd syrc && ./syrc 2>&1
-    - name: INTENTIONAL FAILURE
-      run: exit 1
